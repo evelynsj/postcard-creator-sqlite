@@ -26,7 +26,7 @@ postcardTbl.get(verifyDB, (err, val) => {
 
 const createPostcardTable = () => {
     const cmd =
-        "CREATE TABLE Postcard ( id INTEGER PRIMARY KEY, image TEXT, font TEXT, background TEXT, message TEXT, url TEXT)";
+        "CREATE TABLE Postcard ( id INTEGER PRIMARY KEY, image TEXT, font TEXT, background TEXT, message TEXT, url TEXT UNIQUE)";
     postcardTbl.run(cmd, (err, _) => {
         if (err) {
             console.log("Database creation failure", err.message);
@@ -105,18 +105,32 @@ app.post("/saveDisplay", function (req, res) {
     const background = req.body.color;
     const font = req.body.font;
     const message = req.body.message;
+    const url = generateQueryString()
 
     const insert =
-        "INSERT INTO Postcard (image, background, font, message) VALUES (?,?,?,?)";
-    postcardTbl.run(insert, image, background, font, message, function (err) {
+        "INSERT INTO Postcard (image, background, font, message, url) VALUES (?,?,?,?,?)";
+    postcardTbl.run(insert, image, background, font, message, url, function (err) {
         if (err) {
             console.log("DB insert error", err.message);
         } else {
             console.log("Insert successful at row id", this.lastID);
-            res.send("r");
+            res.send(url);
         }
     });
 });
+
+app.get("/showPostcard", (req, res) => {
+    const url = req.query.id
+    const getData = `SELECT image, font, background, message FROM Postcard WHERE url='${url}'`;
+    postcardTbl.get(getData, (err, val) => {
+        if (err) {
+            console.log("Error", err)
+        } else {
+            console.log("Success", val)
+            res.json(val)
+        }
+    })
+})
 
 // The GET AJAX query is handled by the static server, since the
 // file postcardData.json is stored in /public

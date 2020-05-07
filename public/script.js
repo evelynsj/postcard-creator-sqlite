@@ -100,7 +100,7 @@ document.querySelector('#save').addEventListener('click', () => {
   xmlhttp.onloadend = function(e) {
     console.log(xmlhttp.responseText);
     // immediately switch to display view
-    // window.location = "display.html";
+    window.location.href = `display.html?id=${xmlhttp.responseText}`;
   }
   // all set up!  Send off the HTTP request
   xmlhttp.send(JSON.stringify(data));

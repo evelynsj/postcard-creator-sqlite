@@ -5,7 +5,9 @@
 
 let xhr = new XMLHttpRequest();
 
-xhr.open("GET", 'postcardData.json');
+const url = window.location.href
+
+xhr.open("GET", `/showPostcard?id=${url.substring(url.indexOf('=') + 1)}`); // TODO: Not the most elegant
 xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
 // set up callback function that will run when the HTTP response comes back
@@ -25,9 +27,8 @@ xhr.onloadend = function(e) {
   // textContent throws away newlines; so use innerText instead
   postcardMessage.innerText = data.message; 
   postcardMessage.className = data.font;
-  document.querySelector(".postcard").style.backgroundColor = data.color;
+  document.querySelector(".postcard").style.backgroundColor = data.background;
 }
 
 // send off request
 xhr.send(null);
-
