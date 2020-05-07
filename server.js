@@ -3,11 +3,40 @@
 
 // include modules
 const express = require("express");
-
 const multer = require("multer");
 const bodyParser = require("body-parser");
 const fs = require("fs");
+const sql = require("sqlite3").verbose();
 
+//======================== BUILDING DATABASE ===============================
+const postcardTbl = new sql.Database("postcards.db");
+
+const verifyDB =
+    "SELECT name FROM sqlite_master WHERE type='table' AND name='Postcard'";
+postcardTbl.get(verifyDB, (err, val) => {
+    if (err) {
+        console.log("Error verifying database", err);
+    } else if (!val) {
+        console.log("No database file - creating one");
+        createPostcardTable();
+    } else {
+        console.log("Database file found", val);
+    }
+});
+
+const createPostcardTable = () => {
+    const cmd =
+        "CREATE TABLE Postcard ( id INTEGER PRIMARY KEY, imageName TEXT, font TEXT, background TEXT, message TEXT, url TEXT)";
+    postcardTbl.run(cmd, (err, _) => {
+        if (err) {
+            console.log("Database creation failure", err.message);
+        } else {
+            console.log("Created database");
+        }
+    });
+};
+
+//======================== UTIL FUNCTION ===============================
 const generateQueryString = () => {
     let result = "";
     let characters =
@@ -19,6 +48,8 @@ const generateQueryString = () => {
     }
     return result;
 };
+
+//======================== REQUEST HANDLING ===============================
 
 let storage = multer.diskStorage({
     destination: function (req, file, cb) {
