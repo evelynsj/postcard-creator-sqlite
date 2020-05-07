@@ -26,7 +26,7 @@ postcardTbl.get(verifyDB, (err, val) => {
 
 const createPostcardTable = () => {
     const cmd =
-        "CREATE TABLE Postcard ( id INTEGER PRIMARY KEY, imageName TEXT, font TEXT, background TEXT, message TEXT, url TEXT)";
+        "CREATE TABLE Postcard ( id INTEGER PRIMARY KEY, image TEXT, font TEXT, background TEXT, message TEXT, url TEXT)";
     postcardTbl.run(cmd, (err, _) => {
         if (err) {
             console.log("Database creation failure", err.message);
@@ -99,19 +99,23 @@ app.post("/upload", upload.single("newImage"), function (request, response) {
 app.use(bodyParser.json());
 // gets JSON data into req.body
 app.post("/saveDisplay", function (req, res) {
+    // SHARE POSTCARD
     console.log(req.body);
-    // write the JSON into postcardData.json
-    fs.writeFile(
-        __dirname + "/public/postcardData.json",
-        JSON.stringify(req.body),
-        (err) => {
-            if (err) {
-                res.status(404).send("postcard not saved");
-            } else {
-                res.send("All well");
-            }
+    const image = req.body.image;
+    const background = req.body.color;
+    const font = req.body.font;
+    const message = req.body.message;
+
+    const insert =
+        "INSERT INTO Postcard (image, background, font, message) VALUES (?,?,?,?)";
+    postcardTbl.run(insert, image, background, font, message, function (err) {
+        if (err) {
+            console.log("DB insert error", err.message);
+        } else {
+            console.log("Insert successful at row id", this.lastID);
+            res.send("r");
         }
-    );
+    });
 });
 
 // The GET AJAX query is handled by the static server, since the
