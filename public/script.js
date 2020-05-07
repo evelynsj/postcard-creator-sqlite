@@ -81,6 +81,7 @@ colorBoxes.forEach((b, i) => {
 // UPLOAD postcard data
 // When the user hits the button...
 document.querySelector('#save').addEventListener('click', () => {
+  console.log("Share")
   let msg = document.querySelector('#message');
   let img = document.querySelector('#cardImg');
   let data = {
@@ -99,11 +100,26 @@ document.querySelector('#save').addEventListener('click', () => {
   // setup callback function
   xmlhttp.onloadend = function(e) {
     console.log(xmlhttp.responseText);
-    // immediately switch to display view
-    window.location.href = `display.html?id=${xmlhttp.responseText}`;
+
+    // show popup
+    const modal = document.getElementById("modal")
+    modal.style.display = "flex";
+    const innerText = document.getElementById("modal-inner-text")
+    innerText.textContent = `${window.location.href}display.html?id=${xmlhttp.responseText}`
+
   }
   // all set up!  Send off the HTTP request
   xmlhttp.send(JSON.stringify(data));
+})
+
+document.querySelector("#modal-inner-text").addEventListener('click', () => {
+    const innerText = document.getElementById("modal-inner-text");
+    window.location.href = innerText.textContent
+})
+
+document.querySelector("#closeButton").addEventListener('click', () => {
+    const modal = document.getElementById("modal")
+    modal.style.display = "none";
 })
 
 // UPLOAD IMAGE
